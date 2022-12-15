@@ -16,11 +16,14 @@
 // WHEN I choose to update an employee role
 // THEN I am prompted to select an employee to update and their new role and this information is updated in the database
 
-const express = require('express');
+const express = require("express");
 const inquirer = require("inquirer");
+const cTable = require('console.table');
 
 const fs = require("fs");
-const mysql = require('mysql2');
+const mysql = require("mysql2");
+const { ifError } = require("assert");
+const { brotliDecompress } = require("zlib");
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -32,63 +35,124 @@ app.use(express.json());
 // Connect to database
 const db = mysql.createConnection(
   {
-    host: 'localhost',
+    host: "localhost",
     // MySQL Username
-    user: 'root',
+    user: "root",
     // TODO: Add MySQL Password
-    password: 'Bubble12?',
-    database: 'factory_db'
+    password: "Bubble12?",
+    database: "factory_db",
   },
-  console.log(`Connected to the factory_db database.`)
+  console.log(`\u001b[32m Connected to the factory_db database.\u001b[0m`)
 );
 
+db.connect(function (err) {
+    if (err) throw err;
+    console.log(`\u001b[34;1m
+    __  __        __  __                                   
+   |  ||  |_ __  |  ||  | __ _ _ __   __ _  __ _  ___ _ __ 
+   | |||| | '__| | |||| |/ _' | '_ | / _' |/ _' |/ _ | '__|
+   | |  | | | _  | |  | | (_| | | | | (_| | (_| |  __/ |   
+   |_|  |_|_|(_) |_|  |_||__,_|_| |_||__,_||__, ||___|_|   
+                                           |___/           
+   `);
 
+    startPrompt(); // START
+});
 
 const startPrompt = () => {
-    console.log(`
-     __  __        __  __                                   
-    |  ||  |_ __  |  ||  | __ _ _ __   __ _  __ _  ___ _ __ 
-    | |||| | '__| | |||| |/ _' | '_ | / _' |/ _' |/ _ | '__|
-    | |  | | | _  | |  | | (_| | | | | (_| | (_| |  __/ |   
-    |_|  |_|_|(_) |_|  |_||__,_|_| |_||__,_||__, ||___|_|   
-                                            |___/           
-    `);
+
   return inquirer
     .prompt([
       {
         type: "list",
         message: "What would you like to do?",
-        name: "contact",
-        choices: ["Add Employee", "Update Employee Role", "View All Roles", "Add Role", "View All Departments", "Add Department", "Quit"],
-      },
-      {
-        type: "input",
-        name: "initialize",
-        message: "What would you like to do?",
-      },
-      {
-        type: "checkbox",
-        message: "What languages do you know?",
-        name: "stack",
-        choices: ["HTML", "CSS", "JavaScript", "MySQL"],
-      },
-      {
-        type: "list",
-        message: "What is your preferred method of communication?",
-        name: "contact",
-        choices: ["email", "phone", "telekinesis"],
-      },
+        name: "choice",
+        choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee Role', "\u001b[31;1mQuit\u001b[0m"]
+      }
     ])
-    .then((data) => {
-      const filename = `${data.name.toLowerCase().split(" ").join("")}.json`;
 
-      fs.writeFile(filename, JSON.stringify(data, null, "\t"), (err) => (err ? console.log(err) : console.log("Success!")));
+    .then(function ({ choice }) {
+      switch (choice) {
+        case "View All Departments":
+          allDepartments();
+          break;
+
+        case "View All Roles":
+          allRoles();
+          break;
+
+        case "View All Employees":
+          allEmployees();
+          break;
+
+        case "Add Department":
+          addDepartment();
+          break;
+
+        case "Add Role":
+          addRole();
+          break;
+
+        case "Add Employee":
+          addEmployee();
+          break;
+
+          case "Update Employee Role":
+          updateRole();
+          break;
+
+        case "Quit":
+          connection.end();
+          break;
+      }
     });
 };
 
 
-startPrompt();
 
+function allDepartments() {
+    db.query('SELECT * FROM department', function (err, results) {
+        if (err) {
+            console.log(err);
+        }
+        console.log("\n\n\u001b[32;1m--------All Departments--------\u001b[0m\n");
+        console.table(results);
+      });
+    startPrompt();
+}
+function allRoles() {
+    db.query('SELECT * FROM role', function (err, results) {
+        if (err) {
+            console.log(err);
+        }
+        console.log("\n\n\u001b[32;1m--------All Roles--------\u001b[0m\n");
+        console.table(results);
+      });
+    startPrompt();
+}
+function allEmployees() {
+    db.query('SELECT * FROM employee', function (err, results) {
+        if (err) {
+            console.log(err);
+        }
+        console.log("\n\n\u001b[32;1m--------All Employees--------\u001b[0m\n");
+        console.table(results);
+      });
+    startPrompt();
+}
+function addDepartment() {
+    db.query()
+    startPrompt();
+}
+function addRole() {
+    startPrompt();
+}
+function addEmployee() {
+    startPrompt();
+}
+function updateRole() {
+    startPrompt();
+}
 
 
 // Query database using COUNT() and GROUP BY
