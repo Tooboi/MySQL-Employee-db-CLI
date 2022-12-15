@@ -47,10 +47,10 @@ db.connect(function (err) {
   if (err) throw err;
   console.log(`\u001b[34;1m
     __  __        __  __                                   
-   |  ||  |_ __  |  ||  | __ _ _ __   __ _  __ _  ___ _ __ 
-   | |||| | '__| | |||| |/ _' | '_ | / _' |/ _' |/ _ | '__|
+   |  ||  |_ __  |  ||  | __ _ _ ___  __ _  __ _  ___ _ __ 
+   | |||| | '__| | |||| |/ _' | '_  |/ _' |/ _' |/ _ | '__|
    | |  | | | _  | |  | | (_| | | | | (_| | (_| |  __/ |   
-   |_|  |_|_|(_) |_|  |_||__,_|_| |_||__,_||__, ||___|_|   
+   |_|  |_|_|(_) |_|  |_|.__._|_| |_|.__,_||__, |.___|_|   
                                            |___/           
    `);
 
@@ -105,7 +105,7 @@ const startPrompt = () => {
     });
 };
 
-const allDepartments = () => {
+function allDepartments() {
   db.query("SELECT * FROM department", function (err, results) {
     if (err) {
       console.log(err);
@@ -146,33 +146,32 @@ function addDepartment() {
     ])
     .then((answer) => {
       let depart = answer.departmentNew;
-      db.query(`INSERT INTO department (name) VALUES (?)`, depart, (err, results) => {
+      db.query(`INSERT INTO department (department_name) VALUES (?)`, depart, (err, results) => {
         if (err) throw err;
-        
-        console.log(`\n\u001b[33mAdded ${depart} Department\u001b[0m\n`);
+
+        console.log(`\n\u001b[33m--------Added ${depart} Department--------\u001b[0m\n`);
         startPrompt();
       });
     });
 }
-var rolesList = []
+var rolesList = [];
 function addRole() {
-    db.query("SELECT name FROM department", function (err, results) {
+  db.query("SELECT department_name FROM department", function (err, results) {
+    if (err) {
+      console.log(err);
+    }
+    for (var i = 0; i < results.length; i++) {
+      rolesItem = results[i].department_name;
+      if (!rolesList.includes(rolesItem)) {
+        rolesList.push(rolesItem);
+      }
+      
+    }
+    // console.log(rolesList);
+    // return rolesList;
+  });
 
-
-        if (err) {
-          console.log(err);
-        }
-        for (let i = 0; i < results.length; i++) {
-            rolesItem = results[i].name;
-            
-           rolesItem.forEach(rolesItem => {
-            rolesList.push(rolesItem);
-            console.log(rolesList);
-        }) 
-        }
-    })
-    
-    inquirer
+  inquirer
     .prompt([
       {
         type: "type",
@@ -187,16 +186,18 @@ function addRole() {
       {
         type: "list",
         message: "Which department does the role belong to?",
-        name: "first_name",
+        name: "departmentType",
         choices: rolesList,
       },
     ])
     .then((answer) => {
-      let depart = answer.departmentNew;
-      db.query(`INSERT INTO department (name) VALUES (?)`, depart, (err, results) => {
+      let rolePost = answer.roleName
+      let roleSalaryPost = answer.roleSalary
+      // let departB = answer.departmentType;
+      db.query(`INSERT INTO role (title, salary) VALUES (?, ?)`, [rolePost, roleSalaryPost], (err, results) => {
         if (err) throw err;
-        
-        console.log(`\n\u001b[33mAdded ${depart} Department\u001b[0m\n`);
+
+        console.log(`\n\u001b[33m--------Added ${rolePost} Role--------\u001b[0m\n`);
         startPrompt();
       });
     });
