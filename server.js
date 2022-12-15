@@ -164,15 +164,11 @@ function addRole() {
         }
         for (let i = 0; i < results.length; i++) {
             rolesItem = results[i].name;
-            
+            console.log(rolesItem);
            rolesItem.forEach(rolesItem => {
             rolesList.push(rolesItem)
         }) 
         }
-        
-            // console.log(rolesItem);
-
-        
     })
     
     inquirer
