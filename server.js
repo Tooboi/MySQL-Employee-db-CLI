@@ -259,8 +259,8 @@ function addEmployee() {
     .then((answer) => {
       let titleFPost = answer.employeeFname;
       let titleLPost = answer.employeeLname;
-      let roleB = answer.roleType;
-      let managerPost = answer.managerType;
+      // let roleB = answer.roleType;
+      // let managerPost = answer.managerType;
       // console.log(departB);
       db.query(`INSERT INTO employee (first_name, last_name) VALUES (?, ?)`, [titleFPost, titleLPost], (err, results) => {
         if (err) throw err;
@@ -272,7 +272,46 @@ function addEmployee() {
 }
 
 function updateRole() {
-  startPrompt();
+  db.query("SELECT title FROM role", function (err, results) {
+    if (err) {
+      console.log(err);
+    }
+    for (var i = 0; i < results.length; i++) {
+      titleItem = results[i].title;
+      if (!titlesList.includes(titleItem)) {
+        titlesList.push(titleItem);
+      }
+    }
+  });
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        message: "Which employee would you like to alter?",
+        name: "alterEmp",
+        choices: ["\u001b[31;1mnone\u001b[0m", managersList.slice(-1)],
+      },
+      {
+        type: "list",
+        message: "What is the employee's role?",
+        name: "newRole",
+        choices: titlesList,
+      },
+    ])
+
+    .then((answer) => {
+      let alterEmpP = answer.alterEmp;
+      let newRoleP = answer.newRole;
+      // let roleB = answer.roleType;
+      // let managerPost = answer.managerType;
+      // console.log(departB);
+      db.query(`UPDATE employee SET (title) WHERE last_name = ${alterEmpP} VALUES (?, ?)`, [newRoleP, alterEmpP], (err, results) => {
+        if (err) throw err;
+
+        console.log(`\n\u001b[33m--------Added ${titleFPost} ${titleLPost} To Employee's--------\u001b[0m\n`);
+        startPrompt();
+      });
+    });
 }
 
 // Query database using COUNT() and GROUP BY
