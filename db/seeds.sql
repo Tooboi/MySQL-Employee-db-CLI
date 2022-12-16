@@ -4,7 +4,7 @@ VALUES ("Nursing"),
         ("Janatorial"),
         ("Legal");
 
-INSERT INTO role (title, salary)
+INSERT INTO role (title, salary, department)
 VALUES ("Head Nurse", 80000),
         ("Doctor", 180000),
         ("Cleaner", 65000),
