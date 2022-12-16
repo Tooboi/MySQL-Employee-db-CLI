@@ -45,13 +45,13 @@ const db = mysql.createConnection(
 
 db.connect(function (err) {
   if (err) throw err;
-  console.log(`\u001b[34;1m
-    __  __        __  __                                   
-   |  ||  |_ __  |  ||  | __ _ _ ___  __ _  __ _  ___ _ __ 
-   | |||| | '__| | |||| |/ _' | '_  |/ _' |/ _' |/ _ | '__|
-   | |  | | | _  | |  | | (_| | | | | (_| | (_| |  __/ |   
-   |_|  |_|_|(_) |_|  |_|.__._|_| |_|.__,_||__, |.___|_|   
-                                           |___/           
+  console.log(`
+   \u001b[33;1m __  __       \u001b[32;1m __  __                                   
+   \u001b[33;1m|  ||  |_ __  \u001b[32;1m|  ||  | __ _ _ ___  __ _  __ _  ___ _ __ 
+   \u001b[33;1m| |||| | '__| \u001b[32;1m| |||| |/ _' | '_  |/ _' |/ _' |/ _ | '__|
+   \u001b[33;1m| |  | | | _  \u001b[32;1m| |  | | (_| | | | | (_| | (_| |  __/ |   
+   \u001b[33;1m|_|  |_|_|(_) \u001b[32;1m|_|  |_|.__._|_| |_|.__,_|.__, |.___|_|   
+   \u001b[33;1m              \u001b[32;1m                          |___/           
    `);
 
   startPrompt(); // START
@@ -158,7 +158,7 @@ function addDepartment() {
 }
 var rolesList = [];
 function addRole() {
-  db.query("SELECT department_name FROM department", function (err, results) {
+  db.query("SELECT department_name FROM departments", function (err, results) {
     if (err) {
       console.log(err);
     }
@@ -202,9 +202,75 @@ function addRole() {
       });
     });
 }
+
+var titlesList = [];
+var managersList = [];
 function addEmployee() {
-  startPrompt();
+  db.query("SELECT title FROM role", function (err, results) {
+    if (err) {
+      console.log(err);
+    }
+    for (var i = 0; i < results.length; i++) {
+      titleItem = results[i].title;
+      if (!titlesList.includes(titleItem)) {
+        titlesList.push(titleItem);
+      }
+    }
+  });
+  db.query("SELECT last_name FROM employee", function (err, results) {
+    if (err) {
+      console.log(err);
+    }
+
+    for (var i = 0; i < results.length; i++) {
+      managersItem = results[i].last_name;
+
+      if (!managersList.includes(managersItem)) {
+        managersList.push(managersItem);
+        // console.log(managersList);
+      }
+    }
+  });
+  inquirer
+    .prompt([
+      {
+        type: "type",
+        message: "What is the employee's first name?",
+        name: "employeeFname",
+      },
+      {
+        type: "type",
+        message: "What is the employee's last name?",
+        name: "employeeLname",
+      },
+      {
+        type: "list",
+        message: "What is the employee's role?",
+        name: "roleType",
+        choices: titlesList,
+      },
+      {
+        type: "list",
+        message: "Who is the employee's manager?",
+        name: "managerType",
+        choices: ["\u001b[31;1mnone\u001b[0m", managersList.slice(-1)],
+      },
+    ])
+    .then((answer) => {
+      let titleFPost = answer.employeeFname;
+      let titleLPost = answer.employeeLname;
+      let roleB = answer.roleType;
+      let managerPost = answer.managerType;
+      // console.log(departB);
+      db.query(`INSERT INTO employee (first_name, last_name) VALUES (?, ?)`, [titleFPost, titleLPost], (err, results) => {
+        if (err) throw err;
+
+        console.log(`\n\u001b[33m--------Added ${titleFPost} ${titleLPost} To Employee's--------\u001b[0m\n`);
+        startPrompt();
+      });
+    });
 }
+
 function updateRole() {
   startPrompt();
 }
