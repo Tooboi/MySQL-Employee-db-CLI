@@ -3,8 +3,8 @@ CREATE DATABASE factory_db;
 
 USE factory_db;
 
-CREATE TABLE department (
-    id INT AUTO_INCREMENT,
+CREATE TABLE departments (
+    id INT NOT NULL AUTO_INCREMENT,
     department_name VARCHAR(30),
     PRIMARY KEY (id)
 );
@@ -15,7 +15,7 @@ CREATE TABLE role (
     salary INT,
     department INT,
     FOREIGN KEY (department)
-    REFERENCES department(id)
+    REFERENCES departments(id)
     ON DELETE SET NULL,
     PRIMARY KEY (role_id)
 );

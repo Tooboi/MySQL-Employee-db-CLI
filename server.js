@@ -106,7 +106,7 @@ const startPrompt = () => {
 };
 
 function allDepartments() {
-  db.query("SELECT * FROM department", function (err, results) {
+  db.query("SELECT id AS ID, department_name AS Department FROM departments", function (err, results) {
     if (err) {
       console.log(err);
     }
@@ -114,9 +114,11 @@ function allDepartments() {
     console.table(results);
     startPrompt();
   });
-};
+}
 function allRoles() {
-  db.query("SELECT * FROM role", function (err, results) {
+  const queryInner = `SELECT * FROM role;`;
+
+  db.query(queryInner, function (err, results) {
     if (err) {
       console.log(err);
     }
@@ -146,7 +148,7 @@ function addDepartment() {
     ])
     .then((answer) => {
       let depart = answer.departmentNew;
-      db.query(`INSERT INTO department (department_name) VALUES (?)`, depart, (err, results) => {
+      db.query(`INSERT INTO departments (department_name) VALUES (?)`, depart, (err, results) => {
         if (err) throw err;
 
         console.log(`\n\u001b[33m--------Added ${depart} Department--------\u001b[0m\n`);
@@ -165,10 +167,7 @@ function addRole() {
       if (!rolesList.includes(rolesItem)) {
         rolesList.push(rolesItem);
       }
-      
     }
-    // console.log(rolesList);
-    // return rolesList;
   });
 
   inquirer
@@ -191,9 +190,10 @@ function addRole() {
       },
     ])
     .then((answer) => {
-      let rolePost = answer.roleName
-      let roleSalaryPost = answer.roleSalary
-      // let departB = answer.departmentType;
+      let rolePost = answer.roleName;
+      let roleSalaryPost = answer.roleSalary;
+      let departB = answer.departmentType;
+      console.log(departB);
       db.query(`INSERT INTO role (title, salary) VALUES (?, ?)`, [rolePost, roleSalaryPost], (err, results) => {
         if (err) throw err;
 
